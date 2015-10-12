@@ -27,7 +27,7 @@ public class StringBlock implements Entity {
         ID++;
     }
 
-    private void setXPosition(float x)
+    public void setXPosition(float x)
     {
         this.x = x;
     }
@@ -40,12 +40,6 @@ public class StringBlock implements Entity {
 
     @Override
     public void update() {
-
-        if( (playerCam.position.x - GameVariables.WIDTH/2) > x)
-        {
-            setXPosition(playerCam.position.x + GameVariables.WIDTH/2);
-        }
-
     }
 
     @Override

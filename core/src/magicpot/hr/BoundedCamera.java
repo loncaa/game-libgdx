@@ -26,6 +26,11 @@ public class BoundedCamera extends OrthographicCamera {
         maxHeightBound = maxhb;
     }
 
+    public void setMinWidthBound(float bound)
+    {
+        minWidthBound = bound;
+    }
+
     public void setPosition(float x, float y){
         if(x > minWidthBound && x < maxWidthBound)
             position.x = x;

@@ -8,8 +8,8 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import magicpot.hr.BoundedCamera;
 import magicpot.hr.GameVariables;
@@ -23,21 +23,21 @@ import magicpot.hr.model.StringBlock;
  */
 public class PlayState extends State {
 
-    private Player img;
+    private Player player;
     private BoundedCamera playerCamera;
 
     private GlyphLayout testLayout;
     private BitmapFont font;
 
-    //bolje je koristiti queue!
-    private List<StringBlock> blockList;
+    private Queue<StringBlock> blockQueue;
     private int capacity = 5;
     private float blockWidth;
+    private float blockPosition = 0f;
 
     public PlayState(StateManager manager)
     {
         super(manager);
-        img = new Player(0, 0, 32, 32);
+        player = new Player(0, 0, 32, 32);
 
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/prstart.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -54,25 +54,25 @@ public class PlayState extends State {
         playerCamera.setToOrtho(false, GameVariables.WIDTH, GameVariables.HEIGHT);
         playerCamera.setBounds(GameVariables.WIDTH / 2, 0, GameVariables.WIDTH * 3 - GameVariables.WIDTH / 2, GameVariables.HEIGHT);
 
-        blockList = new ArrayList<StringBlock>(capacity);
+        blockQueue = new LinkedList<StringBlock>();
         blockWidth = GameVariables.WIDTH / capacity;
+        blockPosition = blockWidth/2;
         for(int i = 0; i < capacity; i++)
-            blockList.add(new StringBlock(playerCamera, font, (blockWidth)*i + blockWidth/2, 25));
-
+            blockQueue.add(new StringBlock(playerCamera, font, (blockWidth) * i + blockWidth / 2, 25));
     }
 
     @Override
     public void update() {
 
         playerCamera.update();
+        player.update();
 
-        img.update();
         if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE))
         {
-            img.startExplosion();
+            player.startExplosion();
         }
 
-        if(img.isExplosionEnded())
+        if(player.isExplosionEnded())
         {
             State ps = manager.getPreviousState();
             if(ps != null)
@@ -80,11 +80,20 @@ public class PlayState extends State {
             else
                 manager.pushState(new PauseState(manager));
 
-            img.explosionEnded();
+            player.explosionEnded();
         }
 
-        for(StringBlock b : blockList)
-            b.update();
+        if(playerCamera.position.x - GameVariables.WIDTH/2  > blockPosition)
+        {
+            blockPosition += blockWidth;
+
+            StringBlock sb = blockQueue.poll();
+            sb.setXPosition(playerCamera.position.x + GameVariables.WIDTH/2);
+            blockQueue.add(sb);
+
+            playerCamera.setMinWidthBound(playerCamera.position.x);
+
+        }
     }
 
     @Override
@@ -92,10 +101,10 @@ public class PlayState extends State {
 
         batch.setProjectionMatrix(playerCamera.combined);
         batch.begin();
-        img.render(batch);
-        playerCamera.setPosition(img.getPosx(), img.getPosy());
+        player.render(batch);
+        playerCamera.setPosition(player.getPosx(), player.getPosy());
 
-        for(StringBlock b : blockList)
+        for(StringBlock b : blockQueue)
             b.render(batch);
 
         batch.end();

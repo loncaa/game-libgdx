@@ -1,23 +1,22 @@
 package magicpot.hr.view;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader;
-import com.badlogic.gdx.math.Vector3;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import magicpot.hr.BoundedCamera;
 import magicpot.hr.GameVariables;
 import magicpot.hr.controller.State;
 import magicpot.hr.controller.StateManager;
 import magicpot.hr.model.Player;
+import magicpot.hr.model.StringBlock;
 
 /**
  * Created by XXX on 27.9.2015..
@@ -29,6 +28,11 @@ public class PlayState extends State {
 
     private GlyphLayout testLayout;
     private BitmapFont font;
+
+    //bolje je koristiti queue!
+    private List<StringBlock> blockList;
+    private int capacity = 5;
+    private float blockWidth;
 
     public PlayState(StateManager manager)
     {
@@ -48,7 +52,13 @@ public class PlayState extends State {
 
         playerCamera = new BoundedCamera();
         playerCamera.setToOrtho(false, GameVariables.WIDTH, GameVariables.HEIGHT);
-        playerCamera.setBounds(GameVariables.WIDTH/2, 0, GameVariables.WIDTH*3, GameVariables.HEIGHT);
+        playerCamera.setBounds(GameVariables.WIDTH / 2, 0, GameVariables.WIDTH * 3 - GameVariables.WIDTH / 2, GameVariables.HEIGHT);
+
+        blockList = new ArrayList<StringBlock>(capacity);
+        blockWidth = GameVariables.WIDTH / capacity;
+        for(int i = 0; i < capacity; i++)
+            blockList.add(new StringBlock(playerCamera, font, (blockWidth)*i + blockWidth/2, 25));
+
     }
 
     @Override
@@ -72,6 +82,9 @@ public class PlayState extends State {
 
             img.explosionEnded();
         }
+
+        for(StringBlock b : blockList)
+            b.update();
     }
 
     @Override
@@ -80,9 +93,11 @@ public class PlayState extends State {
         batch.setProjectionMatrix(playerCamera.combined);
         batch.begin();
         img.render(batch);
-        font.draw(batch, "0", 0, 25);
-        font.draw(batch, ""+GameVariables.WIDTH*3, GameVariables.WIDTH*3, 25);
         playerCamera.setPosition(img.getPosx(), img.getPosy());
+
+        for(StringBlock b : blockList)
+            b.render(batch);
+
         batch.end();
 
         batch.setProjectionMatrix(textCam.combined);

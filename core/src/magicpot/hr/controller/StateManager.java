@@ -1,6 +1,8 @@
 package magicpot.hr.controller;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
+
 import java.util.LinkedList;
 
 public class StateManager {

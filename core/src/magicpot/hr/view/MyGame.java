@@ -21,13 +21,12 @@ public class MyGame extends ApplicationAdapter {
 
 	@Override
 	public void create () {
-		batch = new SpriteBatch();
 
+		batch = new SpriteBatch();
 		textureAtlas = new TextureAtlas(Gdx.files.internal("pack/gamepack.pack"));
 
 		manager = new StateManager();
 		manager.pushState(new PlayState(manager));
-
 	}
 
 	@Override

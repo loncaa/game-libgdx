@@ -3,8 +3,10 @@ package magicpot.hr.view;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 
@@ -18,9 +20,7 @@ import magicpot.hr.controller.StateManager;
 import magicpot.hr.model.Player;
 import magicpot.hr.model.StringBlock;
 
-/**
- * Created by XXX on 27.9.2015..
- */
+
 public class PlayState extends State {
 
     private Player player;
@@ -33,6 +33,8 @@ public class PlayState extends State {
     private int capacity = 5;
     private float blockWidth;
     private float blockPosition = 0f;
+
+    private Sprite light;
 
     public PlayState(StateManager manager)
     {
@@ -88,27 +90,25 @@ public class PlayState extends State {
             blockPosition += blockWidth;
 
             StringBlock sb = blockQueue.poll();
-            sb.setXPosition(playerCamera.position.x + GameVariables.WIDTH/2);
+            sb.setXPosition(playerCamera.position.x + GameVariables.WIDTH / 2);
             blockQueue.add(sb);
-
-            playerCamera.setMinWidthBound(playerCamera.position.x);
-
         }
     }
 
     @Override
     public void render(SpriteBatch batch) {
-
+        batch.setShader(MyGame.getShaderProgram());
         batch.setProjectionMatrix(playerCamera.combined);
         batch.begin();
         player.render(batch);
         playerCamera.setPosition(player.getPosx(), player.getPosy());
+        playerCamera.setMinWidthBound(playerCamera.position.x);
 
         for(StringBlock b : blockQueue)
             b.render(batch);
-
         batch.end();
 
+        batch.setShader(null);
         batch.setProjectionMatrix(textCam.combined);
         batch.begin();
         font.draw(batch, testLayout, 10, Gdx.graphics.getHeight() - testLayout.height);

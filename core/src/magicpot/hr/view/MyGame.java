@@ -8,53 +8,45 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 
-import magicpot.hr.GameVariables;
 import magicpot.hr.controller.Resources;
 import magicpot.hr.controller.StateManager;
 
 public class MyGame extends ApplicationAdapter {
 	private SpriteBatch batch;
 	private StateManager manager;
-	private static ShaderProgram program;
 	public static TextureAtlas textureAtlas;
-
 	private static Resources res;
 
 	@Override
 	public void create () {
+		batch = new SpriteBatch();
+		res = new Resources();
 
 		ShaderProgram.pedantic = false;
-		program = new ShaderProgram(
+		res.addShader(new ShaderProgram(
 				Gdx.files.internal("shaders/vertex.glsl").readString() ,
-				Gdx.files.internal("shaders/fragment.glsl").readString());
-		System.out.print(program.isCompiled() ? "Compiled!" : program.getLog());
+				Gdx.files.internal("shaders/fragment.glsl").readString()), "ambient");
+		res.addShader(new ShaderProgram(
+				Gdx.files.internal("shaders/vertex.glsl").readString() ,
+				Gdx.files.internal("shaders/fragment.glsl").readString()), "blur");
 
-		//initShaderProgramVariables();
-
-
-		batch = new SpriteBatch();
-		//batch.setShader(program);
-
-		res = new Resources();
-		res.addTexture(new Texture(Gdx.files.internal("textures/light.png")), "light");
+		res.addTexture(new Texture(Gdx.files.internal("textures/light2.png")), "light");
+		res.addTexture(new Texture(Gdx.files.internal("textures/background.png")), "background");
 		textureAtlas = new TextureAtlas(Gdx.files.internal("pack/gamepack.pack"));
 
 		manager = new StateManager();
 		manager.pushState(new PlayState(manager));
+
+		initShaderProgramVariables();
 	}
 
 	@Override
 	public void render () {
-		Gdx.gl.glClearColor(131 / 255f, 142 / 255f, 102 / 255f, 1);
+		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		manager.update();
 		manager.render(batch);
-	}
-
-	public static ShaderProgram getShaderProgram()
-	{
-		return program;
 	}
 
 	public static Resources getRessources()
@@ -71,15 +63,19 @@ public class MyGame extends ApplicationAdapter {
 	public void dispose() {
 		super.dispose();
 
-		program.dispose();
+		res.dispose();
 		textureAtlas.dispose();
 		batch.dispose();
 	}
 
 	private void initShaderProgramVariables()
 	{
-		program.begin();
-		program.setUniformf("u_res", GameVariables.WIDTH, GameVariables.HEIGHT);
-		program.end();
+		res.getShader("ambient").begin();
+		res.getShader("ambient").setUniformf("u_ambient", 0f, 0f, 0f, 0.4f);
+
+		res.getShader("ambient").setUniformf("u_resolution", Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+		res.getShader("ambient").setUniformi("u_lightmap", 1);
+		res.getShader("ambient").end();
 	}
 }

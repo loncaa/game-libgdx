@@ -5,17 +5,14 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 
-import java.text.Format;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -38,7 +35,7 @@ public class PlayState extends State {
     private TextureRegion fboRegion;
 
     private Queue<StringBlock> blockQueue;
-    private int capacity = 5;
+    private int capacity = 6;
     private float blockWidth;
     private float blockPosition = 0f;
 
@@ -103,7 +100,8 @@ public class PlayState extends State {
             blockPosition += blockWidth;
 
             StringBlock sb = blockQueue.poll();
-            sb.setXPosition(playerCamera.position.x + GameVariables.WIDTH / 2);
+            sb.setX(playerCamera.position.x + GameVariables.WIDTH / 2);
+            sb.setY();
             blockQueue.add(sb);
         }
     }
@@ -130,9 +128,13 @@ public class PlayState extends State {
         batch.begin();
         float lightsize = (float) (player.getWidth()*5);
         batch.draw(MyGame.getRessources().getTexture("light"),
-                player.getPosx() - lightsize/2 + player.getWidth()/2.3f,
-                player.getPosy() - lightsize/2 + player.getHeight()/2.3f,
+                player.getPosx() - lightsize / 2 + player.getWidth() / 2.3f,
+                player.getPosy() - lightsize / 2 + player.getHeight() / 2.3f,
                 lightsize, lightsize);
+
+        for(StringBlock b : blockQueue)
+            b.drawFBO(batch, MyGame.getRessources().getTexture("light"));
+        
         batch.end();
         frameBuffer.end();
         frameBuffer.getColorBufferTexture().bind(1);

@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 /**
  * Created by XXX on 28.9.2015..
  */
-public class Star extends BareObject {
+public class Star extends magicpot.hr.model.fundamental.BareObject {
 
     public Star(float x, float y, int w, int h) {
         super(x, y, w, h);

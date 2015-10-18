@@ -8,19 +8,24 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 
+import java.util.Random;
+
 import magicpot.hr.controller.Resources;
 import magicpot.hr.controller.StateManager;
 
 public class MyGame extends ApplicationAdapter {
 	private SpriteBatch batch;
 	private StateManager manager;
+
 	public static TextureAtlas textureAtlas;
 	private static Resources res;
+	private static Random r;
 
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
 		res = new Resources();
+		r = new Random();
 
 		ShaderProgram.pedantic = false;
 		res.addShader(new ShaderProgram(
@@ -77,5 +82,10 @@ public class MyGame extends ApplicationAdapter {
 
 		res.getShader("ambient").setUniformi("u_lightmap", 1);
 		res.getShader("ambient").end();
+	}
+
+	public static boolean getRandomBoolean()
+	{
+		return r.nextBoolean();
 	}
 }

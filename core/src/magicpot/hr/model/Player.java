@@ -11,7 +11,7 @@ import magicpot.hr.view.MyGame;
 /**
  * Created by XXX on 24.9.2015..
  */
-public class Player extends BareObject {
+public class Player extends magicpot.hr.model.fundamental.BareObject {
 
     private float time = 0;
     private int maxJump = 80;
